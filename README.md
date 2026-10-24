@@ -26,13 +26,13 @@ The repository root is the skill folder, so cloning it into your skills director
 **Claude Code, macOS / Linux**
 
 ```bash
-git clone https://github.com/<your-username>/video-reader.git ~/.claude/skills/video-reader
+git clone https://github.com/bossraja0352/video-reader-skill.git ~/.claude/skills/video-reader
 ```
 
 **Claude Code, Windows (PowerShell)**
 
 ```powershell
-git clone https://github.com/<your-username>/video-reader.git "$env:USERPROFILE\.claude\skills\video-reader"
+git clone https://github.com/bossraja0352/video-reader-skill.git "$env:USERPROFILE\.claude\skills\video-reader"
 ```
 
 To use it in one project only, clone into `<project>/.claude/skills/video-reader` instead.
