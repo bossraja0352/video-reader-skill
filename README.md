@@ -84,7 +84,19 @@ Use `python3` instead of `python` where that is the name on your system.
 | `--every SEC` | One frame per N seconds instead of a fixed count | off |
 | `--start S`, `--end S` | Only sample this part of the video, in seconds | whole video |
 | `--width PX` | Maximum frame width; smaller frames cost fewer image tokens | 768 |
+| `--scenes [N]` | Also take up to N frames (8 if no number) at the strongest scene changes, to catch short events. Put the video path before this flag. Files end in `_scene.jpg` | off |
+| `--scene-threshold X` | Minimum change score for `--scenes`. Raise it for shaky or noisy footage | 0.003 |
 | `--backend` | `auto`, `ffmpeg` or `cv2` | `auto` |
+
+### Catching short events with `--scenes`
+
+Evenly spaced frames can fall on both sides of a popup or error flash that lasts a fraction of a second. With `--scenes` the script also scans the range for frames that differ most from the one before, and adds those on top of the even sampling:
+
+```bash
+python scripts/video_frames.py extract "screen-recording.mp4" --scenes
+```
+
+The threshold is deliberately low, because a small popup on a static screen scores only about 0.004, while a popup covering a big part of the screen scores 0.2 or more. Changes are ranked by size and the top N are kept, at least 0.2 s apart. On a long or busy video a small event can still lose out to bigger ones, so zoom in with `--start` / `--end`. The scan decodes the whole range, so it is slower than plain sampling on long videos.
 
 ### Recommended workflow: coarse, then fine
 
@@ -100,7 +112,7 @@ Take the default 16 frames first. If the interesting part is, say, between 4 s a
 ## Limits
 
 - **No audio.** The script tells you whether the file has an audio track, but it does not transcribe it.
-- **Sampling can miss short events.** Anything shorter than the gap between frames may not appear in any frame.
+- **Sampling can miss short events.** Anything shorter than the gap between frames may not appear in any frame. `--scenes` improves the odds a lot but does not guarantee it.
 - **Frames are sent to your AI provider.** Everything runs locally, but once the assistant opens a frame as an image, that image goes to whichever model your tool uses. Don't run it on videos you wouldn't be willing to show that provider.
 - Each frame costs image tokens. More than about 20 frames per pass is rarely needed.
 

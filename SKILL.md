@@ -21,6 +21,8 @@ You cannot open a video directly. Sample frames, look at them as images, delete 
 
 2. **Look at every frame** with whatever image-viewing ability you have (in Claude Code: the Read tool on each `.jpg` path; run the reads in parallel). Read them in order and keep the timestamps.
 
+   If the user is hunting for something brief (a flash, popup, error message, glitch, "something appears for a moment"), add `--scenes` to this first command. It takes extra frames where the picture changes most, so a short event is not lost between the evenly spaced frames. Put the video path before the flag.
+
 3. **Zoom in if needed.** The first pass is coarse (default 16 frames over the whole video). If something important happens between, say, 4s and 9s, run a second pass on just that range:
 
    ```
@@ -41,11 +43,13 @@ You cannot open a video directly. Sample frames, look at them as images, delete 
 | `--every SEC` | one frame per N seconds instead (wins over `--max-frames`) |
 | `--start S` / `--end S` | only this part of the video, in seconds |
 | `--width PX` | max frame width, default 768 (keeps image cost low; raise to 1280 to read small text) |
+| `--scenes [N]` | also take up to N frames (default 8) at the strongest scene changes; files end `_scene.jpg` |
+| `--scene-threshold X` | minimum change score for `--scenes`, default 0.003 (raise it to get fewer frames on shaky or noisy footage) |
 
 ## Limits to state honestly
 
 - **No audio.** The script reports whether the file has an audio track. If speech matters, say you did not hear it; only transcribe if the user asks and a speech-to-text tool is available.
-- **Sampling can miss short events.** A flash shorter than the gap between frames (printed as "one every ~X s") may not be visible. Narrow the range and extract again.
+- **Sampling can miss short events.** A flash shorter than the gap between frames (printed as "one every ~X s") may not be visible. Use `--scenes`, or narrow the range and extract again. `--scenes` ranks changes by size and keeps the top N, so on a long or busy video a small event can still lose out to bigger ones; zoom in with `--start`/`--end` then.
 - Every frame costs image tokens. Do not push past ~20 frames per pass unless the question needs it.
 
 ## Requirements
